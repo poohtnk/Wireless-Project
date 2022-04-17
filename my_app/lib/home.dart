@@ -58,7 +58,7 @@ class CryptoListState extends State<CryptoList> {
         cryptoDatas.add(responseJSON["data"][i.toString()]);
       }
     }
-    print(cryptoDatas);
+    // print(cryptoDatas);
 
     setState(() {
       this._cryptoList = cryptoDatas;
@@ -156,14 +156,37 @@ class CryptoListState extends State<CryptoList> {
   }
 
   Widget _buildRow(Map crypto, MaterialColor color) {
-    final bool favourited = _saved.contains(crypto);
+    var favourited = false;
+    _saved.forEach((element) {
+      if (element['id'] == crypto['id']) {
+        favourited = true;
+      }
+    });
+    print(favourited);
 
     void _fav() {
       setState(() {
+        Map<dynamic, dynamic> temp = {};
         if (favourited) {
-          _saved.remove(crypto);
+          _saved.forEach((element) {
+            if (element['id'] == crypto['id']) {
+              favourited = false;
+              temp = element;
+            }
+          });
+          if(!favourited) {
+              _saved.remove(temp);
+          }
         } else {
-          _saved.add(crypto);
+          var dup = false;
+          _saved.forEach((element) {
+            if (element['id'] == crypto['id']) {
+              dup = true;
+            }
+          });
+          if (!dup) {
+            _saved.add(crypto);
+          }
         }
       });
     }

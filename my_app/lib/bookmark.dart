@@ -58,7 +58,7 @@ class CryptoListState extends State<CryptoList> {
         cryptoDatas.add(responseJSON["data"][i.toString()]);
       }
     }
-    print(cryptoDatas);
+    // print(cryptoDatas);
 
     setState(() {
       this._cryptoList = cryptoDatas;
@@ -87,8 +87,9 @@ class CryptoListState extends State<CryptoList> {
         child: new CircularProgressIndicator(),
       );
     } else {
-      return new Widget(
-        body: _buildCryptoList(),
+      return new RefreshIndicator(
+        child: _buildCryptoList(),
+        onRefresh: getCryptoPrices,
       );
     }
   }
@@ -122,14 +123,17 @@ class CryptoListState extends State<CryptoList> {
 
   Widget _buildRow(Map crypto, MaterialColor color) {
     final bool favourited = _saved.contains(crypto);
-    print(_saved);
+    // print(_saved);
 
     void _fav() {
       setState(() {
         if (favourited) {
           _saved.remove(crypto);
         } else {
-          _saved.add(crypto);
+          if(!_saved.contains(crypto)){
+            print("hi");
+            _saved.add(crypto);
+          }
         }
       });
     }

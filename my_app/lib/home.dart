@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'main.dart';
 
 void main() => runApp(MyList());
 
@@ -28,7 +29,7 @@ class CryptoList extends StatefulWidget {
 
 class CryptoListState extends State<CryptoList> {
   List _cryptoList = [];
-  final _saved = Set<Map>();
+  final _saved = savedList.savedGlobal;
   final _boldStyle = new TextStyle(fontWeight: FontWeight.bold);
   bool _loading = false;
   final List<MaterialColor> _colors = [

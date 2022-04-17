@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'home.dart';
+import 'main.dart';
 
 void main() => runApp(BookMark());
 
@@ -15,16 +15,21 @@ class BookMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Bookmark',
+      title: 'Crypto Price List',
       theme: new ThemeData(primaryColor: Colors.white),
       home: CryptoList(),
     );
   }
 }
 
+class CryptoList extends StatefulWidget {
+  @override
+  CryptoListState createState() => CryptoListState();
+}
+
 class CryptoListState extends State<CryptoList> {
   List _cryptoList = [];
-  final _saved = Set<Map>();
+  final _saved = savedList.savedGlobal;
   final _boldStyle = new TextStyle(fontWeight: FontWeight.bold);
   bool _loading = false;
   final List<MaterialColor> _colors = [
@@ -40,7 +45,7 @@ class CryptoListState extends State<CryptoList> {
 
     print('getting crypto prices');
     String _apiURL =
-        "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=1,2,3";
+        "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=1,2";
     setState(() {
       this._loading = true;
     });
@@ -82,9 +87,8 @@ class CryptoListState extends State<CryptoList> {
         child: new CircularProgressIndicator(),
       );
     } else {
-      return new RefreshIndicator(
-        child: _buildCryptoList(),
-        onRefresh: getCryptoPrices,
+      return new Widget(
+        body: _buildCryptoList(),
       );
     }
   }
@@ -104,37 +108,6 @@ class CryptoListState extends State<CryptoList> {
         body: _getMainBody());
   }
 
-  void _pushSaved() {
-    Navigator.of(context).push(
-      new MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          final Iterable<ListTile> tiles = _saved.map(
-            (crypto) {
-              return new ListTile(
-                leading: _getLeadingWidget(crypto['name'], Colors.blue),
-                title: Text(crypto['name']),
-                subtitle: Text(
-                  cryptoPrice(crypto),
-                  style: _boldStyle,
-                ),
-              );
-            },
-          );
-          final List<Widget> divided = ListTile.divideTiles(
-            context: context,
-            tiles: tiles,
-          ).toList();
-          return new Scaffold(
-            appBar: new AppBar(
-              title: const Text('Saved Cryptos'),
-            ),
-            body: new ListView(children: divided),
-          );
-        },
-      ),
-    );
-  }
-
   Widget _buildCryptoList() {
     return ListView.builder(
         itemCount: _saved.length,
@@ -143,12 +116,13 @@ class CryptoListState extends State<CryptoList> {
           final index = i;
           print(index);
           final MaterialColor color = _colors[index % _colors.length];
-          return _buildRow(_cryptoList[index], color);
+          return _buildRow(_saved.elementAt(index), color);
         });
   }
 
   Widget _buildRow(Map crypto, MaterialColor color) {
     final bool favourited = _saved.contains(crypto);
+    print(_saved);
 
     void _fav() {
       setState(() {

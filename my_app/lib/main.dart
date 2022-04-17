@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-
 import 'test.dart';
 import 'home.dart';
 import 'bookmark.dart';
@@ -23,6 +22,10 @@ class MyApp extends StatelessWidget {
       home: MyStatefulWidget(),
     );
   }
+}
+
+class savedList {
+  static var savedGlobal = Set<Map>();
 }
 
 class MyStatefulWidget extends StatefulWidget {

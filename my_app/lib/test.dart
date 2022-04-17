@@ -1,4 +1,10 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:core';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(const MyApp());
 
@@ -12,20 +18,9 @@ class MyApp extends StatelessWidget {
         ExtractArgumentsScreen.routeName: (context) =>
             const ExtractArgumentsScreen(),
       },
-      // Provide a function to handle named routes.
-      // Use this function to identify the named
-      // route being pushed, and create the correct
-      // Screen.
       onGenerateRoute: (settings) {
-        // If you push the PassArguments route
         if (settings.name == PassArgumentsScreen.routeName) {
-          // Cast the arguments to the correct
-          // type: ScreenArguments.
           final args = settings.arguments as ScreenArguments;
-
-          // Then, extract the required data from
-          // the arguments and pass the data to the
-          // correct screen.
           return MaterialPageRoute(
             builder: (context) {
               return PassArgumentsScreen(
@@ -35,13 +30,6 @@ class MyApp extends StatelessWidget {
             },
           );
         }
-        // The code only supports
-        // PassArgumentsScreen.routeName right now.
-        // Other values need to be implemented if we
-        // add them. The assertion here will help remind
-        // us of that higher up in the call stack, since
-        // this assertion would otherwise fire somewhere
-        // in the framework.
         assert(false, 'Need to implement ${settings.name}');
         return null;
       },
@@ -64,15 +52,8 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // A button that navigates to a named route.
-            // The named route extracts the arguments
-            // by itself.
             ElevatedButton(
               onPressed: () {
-                // When the user taps the button,
-                // navigate to a named route and
-                // provide the arguments as an optional
-                // parameter.
                 Navigator.pushNamed(
                   context,
                   PassArgumentsScreen.routeName,
@@ -90,7 +71,7 @@ class HomeScreen extends StatelessWidget {
                     width: 100.0,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('btc-icon.png'),
+                        image: AssetImage('./assets/images/btc-icon.png'),
                       ),
                       shape: BoxShape.circle,
                     ),
@@ -109,7 +90,7 @@ class HomeScreen extends StatelessWidget {
                     width: 400.0,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('btc.jpg'),
+                        image: AssetImage('./assets/images/btc.jpg'),
                         fit: BoxFit.fitHeight,
                       ),
                       shape: BoxShape.rectangle,
@@ -127,15 +108,9 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            // A button that navigates to a named route.
-            // For this route, extract the arguments in
-            // the onGenerateRoute function and pass them
-            // to the screen.
+
             ElevatedButton(
               onPressed: () {
-                // When the user taps the button, navigate
-                // to a named route and provide the arguments
-                // as an optional parameter.
                 Navigator.pushNamed(
                   context,
                   PassArgumentsScreen.routeName,
@@ -153,7 +128,7 @@ class HomeScreen extends StatelessWidget {
                     width: 100.0,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('eth-icon.png'),
+                        image: AssetImage('./assets/images/eth-icon.png'),
                       ),
                       shape: BoxShape.circle,
                     ),
@@ -172,7 +147,7 @@ class HomeScreen extends StatelessWidget {
                     width: 400.0,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('eth.jpg'),
+                        image: AssetImage('./assets/images/eth.jpg'),
                         fit: BoxFit.fitHeight,
                       ),
                       shape: BoxShape.rectangle,
@@ -206,8 +181,6 @@ class ExtractArgumentsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Extract the arguments from the current ModalRoute
-    // settings and cast them as ScreenArguments.
     final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
 
     return Scaffold(
@@ -221,8 +194,6 @@ class ExtractArgumentsScreen extends StatelessWidget {
   }
 }
 
-// A Widget that accepts the necessary arguments via the
-// constructor.
 class PassArgumentsScreen extends StatelessWidget {
   static const routeName = '/passArguments';
 
@@ -250,8 +221,7 @@ class PassArgumentsScreen extends StatelessWidget {
               width: 500,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  // use message to open the image, which can be use with API in future implementation
-                  image: AssetImage('assets/$msg.jpg'),
+                  image: AssetImage('assets/images/$msg.jpg'),
                 ),
                 shape: BoxShape.rectangle,
               ),

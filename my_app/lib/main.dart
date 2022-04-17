@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 
 import 'test.dart';
+import 'home.dart';
+import 'bookmark.dart';
 
 void main() => runApp(const MyApp());
 
@@ -32,7 +37,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
-    HomeScreen(),
+    MyList(),
     Text(
       'Search Page (Not Done)',
       style: optionStyle,
@@ -42,10 +47,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       'News Page (Not Done)',
       style: optionStyle,
     ),
-    Text(
-      'Watchlist Page (Not Done)',
-      style: optionStyle,
-    ),
+    BookMark(),
   ];
 
   void _onItemTapped(int index) {

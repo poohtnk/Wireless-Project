@@ -79,20 +79,16 @@ class _SearchPageState extends State<SearchPage> {
     return;
   }
 
-  // This list holds the data for the list view
   List<dynamic> _foundCrypto = [];
   @override
   initState() {
-    // at the beginning, all users are shown
     super.initState();
     getCryptoPrices();
   }
 
-  // This function is called whenever the text field changes
-  void _runFilter(String enteredKeyword) {
+  void _applyFilter(String enteredKeyword) {
     List<dynamic> results = [];
     if (enteredKeyword.isEmpty) {
-      // if the search field is empty or only contains white-space, we'll display all users
       results = _cryptoList;
     } else {
       results = _cryptoList
@@ -100,10 +96,8 @@ class _SearchPageState extends State<SearchPage> {
               .toLowerCase()
               .contains(enteredKeyword.toLowerCase()))
           .toList();
-      // we use the toLowerCase() method to make it case-insensitive
     }
 
-    // Refresh the UI
     setState(() {
       _foundCrypto = results;
     });
@@ -167,7 +161,7 @@ class _SearchPageState extends State<SearchPage> {
               height: 5,
             ),
             TextField(
-              onChanged: (searchKey) => _runFilter(searchKey),
+              onChanged: (searchKey) => _applyFilter(searchKey),
               decoration: const InputDecoration(
                   labelText: 'Search', suffixIcon: Icon(Icons.search)),
             ),

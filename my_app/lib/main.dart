@@ -8,6 +8,7 @@ import 'test.dart';
 import 'home.dart';
 import 'bookmark.dart';
 import 'search.dart';
+import 'news.dart';
 
 void main() => runApp(const MyApp());
 
@@ -44,10 +45,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     MyList(),
     Search(),
     PassArgumentsScreen(title: "BTC", message: "BTC"),
-    Text(
-      'News Page (Not Done)',
-      style: optionStyle,
-    ),
+    News(),
     BookMark(),
   ];
 

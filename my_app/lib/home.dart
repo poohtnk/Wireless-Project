@@ -31,6 +31,10 @@ class CryptoListState extends State<CryptoList> {
   List _cryptoList = [];
   final _saved = savedList.savedGlobal;
   final _boldStyle = new TextStyle(fontWeight: FontWeight.bold);
+  final _percentUP =
+      new TextStyle(fontWeight: FontWeight.bold, color: Colors.green.shade400);
+  final _percentDOWN =
+      new TextStyle(fontWeight: FontWeight.bold, color: Colors.red.shade300);
   bool _loading = false;
   final List<MaterialColor> _colors = [
     Colors.blue,
@@ -39,13 +43,15 @@ class CryptoListState extends State<CryptoList> {
     Colors.teal,
     Colors.cyan
   ];
+  final String iconURL =
+      "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/";
 
   Future<void> getCryptoPrices() async {
     List cryptoDatas = [];
 
     print('getting crypto prices');
     String _apiURL =
-        "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=1,2,3";
+        "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=8";
     setState(() {
       this._loading = true;
     });
@@ -54,8 +60,8 @@ class CryptoListState extends State<CryptoList> {
 
     Map<String, dynamic> responseJSON = json.decode(response.body);
     if (responseJSON["status"]["error_code"] == 0) {
-      for (int i = 1; i <= responseJSON["data"].length; i++) {
-        cryptoDatas.add(responseJSON["data"][i.toString()]);
+      for (int i = 0; i < responseJSON["data"].length; i++) {
+        cryptoDatas.add(responseJSON["data"][i]);
       }
     }
     // print(cryptoDatas);
@@ -74,10 +80,10 @@ class CryptoListState extends State<CryptoList> {
     return "\$" + (d = (d * fac).round() / fac).toString();
   }
 
-  CircleAvatar _getLeadingWidget(String name, MaterialColor color) {
+  CircleAvatar _getLeadingWidget(String symbol) {
+    var sym = symbol.toLowerCase().toString();
     return new CircleAvatar(
-      backgroundColor: color,
-      child: new Text(name[0]),
+      child: Image.network(iconURL + sym + ".png"),
     );
   }
 
@@ -105,9 +111,6 @@ class CryptoListState extends State<CryptoList> {
     return Scaffold(
         appBar: AppBar(
           title: Text('CryptoList'),
-          actions: <Widget>[
-            new IconButton(icon: const Icon(Icons.list), onPressed: _pushSaved),
-          ],
         ),
         body: _getMainBody());
   }
@@ -119,7 +122,7 @@ class CryptoListState extends State<CryptoList> {
           final Iterable<ListTile> tiles = _saved.map(
             (crypto) {
               return new ListTile(
-                leading: _getLeadingWidget(crypto['name'], Colors.blue),
+                leading: _getLeadingWidget(crypto['symbol']),
                 title: Text(crypto['name']),
                 subtitle: Text(
                   cryptoPrice(crypto),
@@ -162,7 +165,6 @@ class CryptoListState extends State<CryptoList> {
         favourited = true;
       }
     });
-    print(favourited);
 
     void _fav() {
       setState(() {
@@ -174,8 +176,8 @@ class CryptoListState extends State<CryptoList> {
               temp = element;
             }
           });
-          if(!favourited) {
-              _saved.remove(temp);
+          if (!favourited) {
+            _saved.remove(temp);
           }
         } else {
           var dup = false;
@@ -192,11 +194,17 @@ class CryptoListState extends State<CryptoList> {
     }
 
     return ListTile(
-      leading: _getLeadingWidget(crypto['name'], color),
+      leading: _getLeadingWidget(crypto['symbol']),
       title: Text(crypto['name']),
       subtitle: Text(
-        cryptoPrice(crypto),
-        style: _boldStyle,
+        cryptoPrice(crypto) +
+            "\n" +
+            (crypto['quote']['USD']['percent_change_1h'] >= 0 ? "↑ " : "↓ ") +
+            (crypto['quote']['USD']['percent_change_1h']).toStringAsFixed(2) +
+            " %",
+        style: crypto['quote']['USD']['percent_change_1h'] >= 0
+            ? _percentUP
+            : _percentDOWN,
       ),
       trailing: new IconButton(
         icon: Icon(favourited ? Icons.favorite : Icons.favorite_border),

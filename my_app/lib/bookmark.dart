@@ -17,20 +17,24 @@ class BookMark extends StatelessWidget {
     return MaterialApp(
       title: 'Crypto Price List',
       theme: new ThemeData(primaryColor: Colors.white),
-      home: CryptoList(),
+      home: BookmarkList(),
     );
   }
 }
 
-class CryptoList extends StatefulWidget {
+class BookmarkList extends StatefulWidget {
   @override
-  CryptoListState createState() => CryptoListState();
+  BookmarkListState createState() => BookmarkListState();
 }
 
-class CryptoListState extends State<CryptoList> {
+class BookmarkListState extends State<BookmarkList> {
   List _cryptoList = [];
   final _saved = savedList.savedGlobal;
   final _boldStyle = new TextStyle(fontWeight: FontWeight.bold);
+  final _percentUP =
+      new TextStyle(fontWeight: FontWeight.bold, color: Colors.green.shade400);
+  final _percentDOWN =
+      new TextStyle(fontWeight: FontWeight.bold, color: Colors.red.shade300);
   bool _loading = false;
   final List<MaterialColor> _colors = [
     Colors.blue,
@@ -39,6 +43,9 @@ class CryptoListState extends State<CryptoList> {
     Colors.teal,
     Colors.cyan
   ];
+
+  final String iconURL =
+      "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/";
 
   Future<void> getCryptoPrices() async {
     List cryptoDatas = [];
@@ -74,10 +81,10 @@ class CryptoListState extends State<CryptoList> {
     return "\$" + (d = (d * fac).round() / fac).toString();
   }
 
-  CircleAvatar _getLeadingWidget(String name, MaterialColor color) {
+  CircleAvatar _getLeadingWidget(String symbol) {
+    var sym = symbol.toLowerCase().toString();
     return new CircleAvatar(
-      backgroundColor: color,
-      child: new Text(name[0]),
+      child: Image.network(iconURL + sym + ".png"),
     );
   }
 
@@ -130,7 +137,7 @@ class CryptoListState extends State<CryptoList> {
         if (favourited) {
           _saved.remove(crypto);
         } else {
-          if(!_saved.contains(crypto)){
+          if (!_saved.contains(crypto)) {
             print("hi");
             _saved.add(crypto);
           }
@@ -139,11 +146,17 @@ class CryptoListState extends State<CryptoList> {
     }
 
     return ListTile(
-      leading: _getLeadingWidget(crypto['name'], color),
+      leading: _getLeadingWidget(crypto['symbol']),
       title: Text(crypto['name']),
       subtitle: Text(
-        cryptoPrice(crypto),
-        style: _boldStyle,
+        cryptoPrice(crypto) +
+            "\n" +
+            (crypto['quote']['USD']['percent_change_1h'] >= 0 ? "↑ " : "↓ ") +
+            (crypto['quote']['USD']['percent_change_1h']).toStringAsFixed(2) +
+            " %",
+        style: crypto['quote']['USD']['percent_change_1h'] >= 0
+            ? _percentUP
+            : _percentDOWN,
       ),
       trailing: new IconButton(
         icon: Icon(favourited ? Icons.favorite : Icons.favorite_border),

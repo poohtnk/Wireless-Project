@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'test.dart';
 import 'home.dart';
 import 'bookmark.dart';
+import 'search.dart';
 
 void main() => runApp(const MyApp());
 
@@ -41,10 +42,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     MyList(),
-    Text(
-      'Search Page (Not Done)',
-      style: optionStyle,
-    ),
+    Search(),
     PassArgumentsScreen(title: "BTC", message: "BTC"),
     Text(
       'News Page (Not Done)',

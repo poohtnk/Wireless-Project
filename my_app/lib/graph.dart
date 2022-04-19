@@ -124,7 +124,7 @@ class PassArgumentsScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
-              height: 300,
+              height: 200,
               width: double.infinity,
               child: SfCartesianChart(
                 plotAreaBorderWidth: 0,

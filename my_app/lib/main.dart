@@ -1,5 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -10,7 +13,37 @@ import 'bookmark.dart';
 import 'search.dart';
 import 'news.dart';
 
-void main() => runApp(const MyApp());
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'high_importance_channel', // id
+    'High Importance Notifications', // title
+    importance: Importance.high,
+    playSound: true);
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('A bg message just showed up :  ${message.messageId}');
+}
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -47,6 +80,85 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     News(),
     BookMark(),
   ];
+
+  void notify() {
+    if (savedList.savedGlobal.isNotEmpty) {
+      print('notify');
+      String msg = "";
+      int count = 0;
+      savedList.savedGlobal.forEach((element) {
+        if (element['quote']['USD']['percent_change_7d'] >= 0) {
+          msg += element['name'] + ", ";
+          count++;
+        }
+      });
+      if (msg != "") {
+        msg = msg.substring(0, msg.length - 1);
+        msg += (count > 1 ? "are": "is");
+        msg += " in interesting trend!";
+        flutterLocalNotificationsPlugin.show(
+            0,
+            "CRYPTO REMINDER!",
+            msg,
+            NotificationDetails(
+                android: AndroidNotificationDetails(channel.id, channel.name,
+                    importance: Importance.high,
+                    color: Colors.blue,
+                    playSound: false,
+                    icon: '@mipmap/ic_launcher')));
+      }
+    } else {
+      print('emp');
+    }
+  }
+
+  Timer? timer;
+  @override
+  void initState() {
+    super.initState();
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                color: Colors.blue,
+                playSound: true,
+                icon: '@mipmap/ic_launcher',
+              ),
+            ));
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('A new onMessageOpenedApp event was published!');
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null) {
+        showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                title: Text("tes1t"),
+                content: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [Text("tes2t")],
+                  ),
+                ),
+              );
+            });
+      }
+    });
+    // check every 5 sec for the sake of presentation and demo
+    timer = Timer.periodic(Duration(seconds: 3600), (Timer t) => notify());
+  }
 
   void _onItemTapped(int index) {
     setState(() {

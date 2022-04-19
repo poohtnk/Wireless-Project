@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'main.dart';
 
@@ -110,6 +111,7 @@ class BookmarkListState extends State<BookmarkList> {
     }
   }
 
+
   @override
   void initState() {
     super.initState();
@@ -160,7 +162,7 @@ class BookmarkListState extends State<BookmarkList> {
         cryptoPrice(crypto) +
             "\n" +
             (crypto['quote']['USD']['percent_change_7d'] >= 0 ? "↑ UPTREND" : "↓ DOWNTREND"),
-        style: crypto['quote']['USD']['percent_change_1h'] >= 0
+        style: crypto['quote']['USD']['percent_change_7d'] >= 0
             ? _percentUP
             : _percentDOWN,
       ),

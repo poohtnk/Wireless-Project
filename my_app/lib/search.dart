@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import './models/chart_model.dart';
+import 'graph.dart';
 
 void main() {
   runApp(const Search());
@@ -56,7 +58,7 @@ class _SearchPageState extends State<SearchPage> {
 
     print('getting crypto prices');
     String _apiURL =
-        "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=8";
+        "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=20";
     setState(() {
       this._loading = true;
     });
@@ -112,14 +114,21 @@ class _SearchPageState extends State<SearchPage> {
 
   CircleAvatar _getLeadingWidget(int index) {
     var sym = _foundCrypto[index]['symbol'].toLowerCase().toString();
-    return new CircleAvatar(
-      child: Image.network(iconURL + sym + ".png"),
+    return CircleAvatar(
+      child: CachedNetworkImage(
+        imageUrl: iconURL+sym+".png",
+        placeholder: (context, url) => CircularProgressIndicator(),
+        errorWidget: (context, msg, error) =>
+          CircleAvatar(
+            backgroundColor: _colors[sym.length%(_colors.length-1)],
+            child: Text(sym[0]),
+          ),
+      ),
     );
   }
 
   Container _crpytoGraph(int index) {
     double price = _foundCrypto[index]['quote']['USD']['price'];
-    print("a $price");
     List<ChartData> data = [
       ChartData(_foundCrypto[index]['quote']['USD']['percent_change_30d'], 1440),
       ChartData(_foundCrypto[index]['quote']['USD']['percent_change_7d'], 720),
@@ -175,6 +184,15 @@ class _SearchPageState extends State<SearchPage> {
                       itemBuilder: (context, index) => Card(
                         key: ValueKey(_foundCrypto[index]["id"]),
                         child: ListTile(
+                          onTap: () {
+                            Navigator.push(
+                              context, MaterialPageRoute(
+                                builder: (
+                                  (context) => PassArgumentsScreen(crypto: _foundCrypto, index: index)
+                                )
+                              )
+                            );
+                          },
                           leading: _getLeadingWidget(index),
                           trailing: _crpytoGraph(index),
                           title: Text(_foundCrypto[index]['name']),

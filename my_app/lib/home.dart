@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'main.dart';
@@ -51,7 +52,7 @@ class CryptoListState extends State<CryptoList> {
 
     print('getting crypto prices');
     String _apiURL =
-        "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=8";
+        "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=20";
     setState(() {
       this._loading = true;
     });
@@ -81,9 +82,17 @@ class CryptoListState extends State<CryptoList> {
   }
 
   CircleAvatar _getLeadingWidget(String symbol) {
-    var sym = symbol.toLowerCase().toString();
-    return new CircleAvatar(
-      child: Image.network(iconURL + sym + ".png"),
+    var sym = symbol.toLowerCase();
+    return CircleAvatar(
+      child: CachedNetworkImage(
+        imageUrl: iconURL+sym+".png",
+        placeholder: (context, url) => CircularProgressIndicator(),
+        errorWidget: (context, e, error) => 
+          CircleAvatar(
+            backgroundColor: _colors[symbol.length%(_colors.length-1)],
+            child: Text(symbol[0]),
+          ),
+      ),
     );
   }
 
@@ -117,11 +126,11 @@ class CryptoListState extends State<CryptoList> {
 
   void _pushSaved() {
     Navigator.of(context).push(
-      new MaterialPageRoute<void>(
+      MaterialPageRoute<void>(
         builder: (BuildContext context) {
           final Iterable<ListTile> tiles = _saved.map(
             (crypto) {
-              return new ListTile(
+              return ListTile(
                 leading: _getLeadingWidget(crypto['symbol']),
                 title: Text(crypto['name']),
                 subtitle: Text(
@@ -152,7 +161,7 @@ class CryptoListState extends State<CryptoList> {
         padding: const EdgeInsets.all(16.0),
         itemBuilder: (context, i) {
           final index = i;
-          print(index);
+          // print(index);
           final MaterialColor color = _colors[index % _colors.length];
           return _buildRow(_cryptoList[index], color);
         });

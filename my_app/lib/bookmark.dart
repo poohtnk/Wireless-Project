@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'main.dart';
@@ -83,8 +84,16 @@ class BookmarkListState extends State<BookmarkList> {
 
   CircleAvatar _getLeadingWidget(String symbol) {
     var sym = symbol.toLowerCase().toString();
-    return new CircleAvatar(
-      child: Image.network(iconURL + sym + ".png"),
+    return CircleAvatar(
+      child: CachedNetworkImage(
+        imageUrl: iconURL+sym+".png",
+        placeholder: (context, url) => CircularProgressIndicator(),
+        errorWidget: (context, e, error) => 
+          CircleAvatar(
+            backgroundColor: _colors[symbol.length%(_colors.length-1)],
+            child: Text(symbol[0]),
+          ),
+      ),
     );
   }
 
@@ -122,7 +131,7 @@ class BookmarkListState extends State<BookmarkList> {
         padding: const EdgeInsets.all(16.0),
         itemBuilder: (context, i) {
           final index = i;
-          print(index);
+          // print(index);
           final MaterialColor color = _colors[index % _colors.length];
           return _buildRow(_saved.elementAt(index), color);
         });
@@ -138,7 +147,6 @@ class BookmarkListState extends State<BookmarkList> {
           _saved.remove(crypto);
         } else {
           if (!_saved.contains(crypto)) {
-            print("hi");
             _saved.add(crypto);
           }
         }
@@ -151,9 +159,7 @@ class BookmarkListState extends State<BookmarkList> {
       subtitle: Text(
         cryptoPrice(crypto) +
             "\n" +
-            (crypto['quote']['USD']['percent_change_1h'] >= 0 ? "↑ " : "↓ ") +
-            (crypto['quote']['USD']['percent_change_1h']).toStringAsFixed(2) +
-            " %",
+            (crypto['quote']['USD']['percent_change_7d'] >= 0 ? "↑ UPTREND" : "↓ DOWNTREND"),
         style: crypto['quote']['USD']['percent_change_1h'] >= 0
             ? _percentUP
             : _percentDOWN,

@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import 'test.dart';
+import 'graph.dart';
 import 'home.dart';
 import 'bookmark.dart';
 import 'search.dart';
@@ -44,7 +44,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   static const List<Widget> _widgetOptions = <Widget>[
     MyList(),
     Search(),
-    PassArgumentsScreen(title: "BTC", message: "BTC"),
     News(),
     BookMark(),
   ];
@@ -70,10 +69,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.auto_graph),
-            label: 'Graph',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.mail),
